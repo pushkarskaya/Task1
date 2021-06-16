@@ -10,7 +10,14 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 
 import io.github.bonigarcia.wdm.WebDriverManager;
+import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.RemoteWebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+
+import java.time.Duration;
+import java.util.concurrent.TimeUnit;
 
 public class ConfigDriver {
     private WebDriver driver;
@@ -24,6 +31,7 @@ public class ConfigDriver {
     @Before
     public void setupTest() {
         driver = new ChromeDriver();
+
     }
 
     @After
@@ -60,16 +68,25 @@ public class ConfigDriver {
         Assert.assertEquals(title,driver.getTitle());
 
     }
+    public WebDriverWait wait;
     @Test
-    public void Tele2() throws InterruptedException{
+    public void tele2() {
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        ChromeOptions options = new ChromeOptions();
+        driver = new ChromeDriver(options);
         driver.get("https://msk.tele2.ru/shop/number");
         WebElement numInput=driver.findElement(By.cssSelector("#searchNumber"));
         logger.info("Поиск номера телефона,содержащего 97");
         numInput.sendKeys("97");
-        Thread.sleep(2000);
+        wait = new WebDriverWait(driver, 5);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[@class='phone-number'][contains(.,'97')or contains(.,'9-7')]")));
+        WebElement element=driver.findElement(By.xpath("//*[@class='phone-number'][contains(.,'97')or contains(.,'9-7')]"));
+        //Если элемент,содержащий 97, не найден на странице,тест упадет
+        Assert.assertNotNull(driver.findElement(By.xpath("//*[@class='phone-number'][contains(.,'97')or contains(.,'9-7')]")).isDisplayed());
+        logger.info(element.getText());
     }
     @Test
-    public void FindCourse() {
+    public void findCourse() {
         driver.get("https://otus.ru");
         WebElement faq = driver.findElement(By.cssSelector(".header2_subheader-link[href=\"/faq/\"]"));
         faq.click();
@@ -85,13 +102,15 @@ public class ConfigDriver {
     }
 
     @Test
-    public void Subscription(){
+    public void subscription(){
         driver.get("https://otus.ru");
         String inputMail="test1@mail.ru";
         WebElement subscribeElement= driver.findElement(By.cssSelector(".input.footer2__subscribe-input[name=email]"));
         subscribeElement.sendKeys(inputMail);
         WebElement subscribeButtonElement=driver.findElement(By.cssSelector(".footer2__subscribe-button"));
         subscribeButtonElement.click();
+        wait = new WebDriverWait(driver, 5);
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".subscribe-modal__success")));
         WebElement sucsessSubscribeElement=driver.findElement((By.cssSelector(".subscribe-modal__success")));
         String sucsess="Вы успешно подписались";
         Assert.assertEquals(sucsess, sucsessSubscribeElement.getText());
