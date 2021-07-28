@@ -1,6 +1,7 @@
 
 import org.junit.*;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
@@ -13,8 +14,11 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
+
+
 
 
 public class CheckAlert {
@@ -133,11 +137,18 @@ public class CheckAlert {
 
         addToCompare.click();
     }
+
+    public void moveToComparisonPage(){
+        WebElement comparisonButton = (new WebDriverWait(driver,10)).until(ExpectedConditions.elementToBeClickable(By.xpath("//a[@href='/my/compare-lists']//span[text()='Сравнить']")));
+        JavascriptExecutor jsexecutor = (JavascriptExecutor)driver;
+        jsexecutor.executeScript("arguments[0].click();", comparisonButton);
+        logger.info("Переходим на страницу сравнения");
+    }
     @Test
         public void testYandex() throws InterruptedException{
 //            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
-            //ChromeOptions options = new ChromeOptions();
-            //driver = new ChromeDriver(options);
+            ChromeOptions options = new ChromeOptions();
+            driver = new ChromeDriver(options);
             logger.info("Старт теста");
             driver.get("https://market.yandex.ru/");
             logger.info("Загружена страница " + driver.getCurrentUrl());
@@ -161,6 +172,8 @@ public class CheckAlert {
             Thread.sleep(2000);
             WebElement addtoCompareSamsung=driver.findElement(By.xpath("(//article[contains(.,'Смартфон Samsung')]/descendant::div[contains(@aria-label,'сравнению')])[1]"));
             addtoCompareSamsung.click();
+            moveToComparisonPage();
+
             WebElement plashka=driver.findElement(By.xpath("//div[contains(text(),'Товар Смартфон Samsung')and contains(text(),'добавлен к сравнению')]"));
             Assert.assertNotNull(driver.findElement(By.xpath("//div[contains(text(),'Товар Смартфон Samsung')and contains(text(),'добавлен к сравнению')]")));
             logger.info("Samsung добавлен к сравнению");
@@ -184,9 +197,78 @@ public class CheckAlert {
         {
             logger.info("На странице сравнения 2 элемента, тест пройден");
         }
+        int sizeElements = driver.findElements(By.xpath("//div//a[contains(text(),'Смартфон Samsung') or contains(text(),'Смартфон Xiaomi')]")).size();
+        logger.info("size= " + sizeElements);
         }
 
-        @Test
+
+    public boolean isElementPresent(By locator) {
+        driver.manage().timeouts().implicitlyWait(0, TimeUnit.SECONDS);
+        try {
+            return driver.findElements(locator).size() > 0;
+        } finally {
+            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        }
+    }
+    @Test
+    public void Eldorado() throws InterruptedException{
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--disable-notifications");// Отключение уведомлений
+        driver = new ChromeDriver(options);
+        logger.info("Старт теста");
+        driver.get("https://www.eldorado.ru/");
+        logger.info("Загружена страница " + driver.getCurrentUrl());
+        WebElement city=driver.findElement(By.xpath("//button[contains(text(),\"Да, верно\")]"));
+        city.click();
+        WebElement catalog=driver.findElement(By.xpath("//a[contains(text(),\"Каталог\")]"));
+        catalog.click();
+        this.getElement(By.xpath("//h2[contains(text(),\"Смартфоны и гаджеты\")]"));
+        //Смартфоны и гаджеты
+        WebElement smartfoGadget=driver.findElement(By.xpath("//h2[contains(text(),\"Смартфоны и гаджеты\")]"));
+        smartfoGadget.click();
+        this.getElement(By.xpath("//a[contains(text(),\"Смартфоны, мобильные телефоны\")]/following-sibling::div/descendant::a[contains(text(),\"Смартфоны\")]"));
+        WebElement smartfons=driver.findElement(By.xpath("//a[contains(text(),\"Смартфоны, мобильные телефоны\")]/following-sibling::div/descendant::a[contains(text(),\"Смартфоны\")]"));
+        smartfons.click();
+        this.getElement(By.xpath("//span[@title=\"Samsung\"]"));
+        WebElement smSamsung=driver.findElement(By.xpath("//span[@title=\"Samsung\"]"));
+        smSamsung.click();
+        this.getElement(By.xpath("//span[@title=\"Xiaomi\"]"));
+        WebElement smXiaomi=driver.findElement(By.xpath("//span[@title=\"Xiaomi\"]"));
+        smXiaomi.click();
+        new WebDriverWait(driver,10).until(ExpectedConditions.elementToBeClickable(By.xpath("(//button[contains(text(),'По цене')])[2]")));
+        //Фильтр по цене
+        WebElement byPrice=driver.findElement(By.xpath("(//button[contains(text(),'По цене')])[2]"));
+        byPrice.click();
+        //Добавляем в сравнение смартфон SAMSUNG
+        this.getElement(By.xpath("(//span[contains(text(),\"Сравнить\")]/ancestor::li/descendant::a[contains(text(),\"Смартфон Samsung\")])[1]"));
+        WebElement samsungCompare= driver.findElement(By.xpath("(//div/descendant::a[contains(text(),'Смартфон Samsung')]/ancestor::div/following-sibling::div/descendant::button[@title='Добавить в список сравнения'])[1]"));
+        samsungCompare.click();
+        //Добавляем в сравнение смартфон Xiaomi
+        WebElement xiaomiCompare= driver.findElement(By.xpath("(//div/descendant::a[contains(text(),'Смартфон Xiaomi')]/ancestor::div/following-sibling::div/descendant::button[@title='Добавить в список сравнения'])[1]"));
+        xiaomiCompare.click();
+        // Сравнить
+        this.getElement(By.xpath("(//span[contains(text(),'Сравнить') and contains(text(),'товара')])[1]"));
+        WebElement compare=driver.findElement(By.xpath("(//span[contains(text(),'Сравнить') and contains(text(),'товара')])[1]"));
+        compare.click();
+        //Переход на страницу сравнения
+          driver.navigate().to("https://www.eldorado.ru/cat/compare.php?section=15448");
+        String cssQuery = ".blob-code-addition, .blob-code-deletion";
+        String script = "return document.querySelectorAll('.compareblockProdName').length;";
+        Object count = ((JavascriptExecutor)driver).executeScript(script);
+        System.out.println("Количество смартфонов на странице сравнения "+count);
+        //Альтернативный способ
+        if (driver.findElements(By.cssSelector(".compareblockProdName")).size()==2)
+        {
+            logger.info("На странице сравнения 2 элемента, тест пройден");
+        }
+        int sizeElements = driver.findElements(By.cssSelector(".compareblockProdName")).size();
+        logger.info("size= " + sizeElements);
+    }
+
+
+
+
+    @Test
         public void CheckMessage () throws InterruptedException {
             By button = By.xpath("//button[contains(text(),'Change message')]");
             By alert = By.xpath("//ngb-alert[contains(text(), 'Message successfully changed')]");
