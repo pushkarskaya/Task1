@@ -1,59 +1,98 @@
-
-import org.junit.*;
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
+
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openqa.selenium.By;
-
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import io.github.bonigarcia.wdm.WebDriverManager;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-import org.testng.annotations.BeforeClass;
-import java.util.concurrent.TimeUnit;
+import org.openqa.selenium.support.PageFactory;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CheckInfo{
-    private WebDriver driver;
     private Logger logger = LogManager.getLogger(CheckInfo.class);
+    public List<String> Data = new ArrayList();
+    public void DataArray(){ //Массив, содержащий личные данные и контакты для ввода и последующего сравнения
+        Data.add("Марияq");
+        Data.add("Mariaq");
+        Data.add("Ивановаq");
+        Data.add("Ivanovaq");
+        Data.add("Milanaq");
+        Data.add("12.01.1963");
 
-    public void teardown() {
-        if (driver != null) {
-            driver.quit();
-        }
+    }
+    public WebDriver wd;
+    List<String> browserOptions = new ArrayList();
+    String url="https://otus.ru";
+
+
+//@Before
+//    public void setupTest() {
+//
+//
+//    }
+//
+//        @After
+//    public void teardown() {
+//        if (wd != null) {
+//            wd.quit();
+//        }
+//    }
+
+    @Test
+    public void setDataTest() {
+        logger.info("Старт теста");
+        browserOptions.add("--start-fullscreen");
+        browserOptions.add("--incognito");
+        browserOptions.add("--disable-notifications");
+        WebDriver wd = WebDriverFactory.createNewDriver(webDriverName.CHROME, browserOptions);
+        wd.get(url);
+        Assert.assertEquals("Онлайн‑курсы для профессионалов, дистанционное обучение современным профессиям",
+                wd.getTitle());
+        LoginPage page = PageFactory.initElements(wd, LoginPage.class);
+        page.authData();
+        page.auth();
+        page.login();
+        page.toLkPage();
+        lkPage pagelk = PageFactory.initElements(wd, lkPage.class);
+        pagelk.clickProfile();//Профиль
+        pagelk.clickLk();//Личный кабинет
+        pagelk.clickTabAbout();//О себе
+        DataArray();//Запись в массив данных, которые будем вставлять
+        pagelk.setPersonalData(Data);
+        pagelk.setPersonalContacts();
+        WebElement saveButton = wd.findElement(By.xpath("//button[@title='Сохранить и продолжить']"));
+        saveButton.click();
+        //teardown();
+        wd.quit();
     }
 
     @Test
-    public void auth() {
+    public void checkDataTest() {
         logger.info("Старт теста");
-        WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
-
-        driver.get("https://otus.ru");
-        WebElement enterRegister=driver.findElement(By.xpath("//button[@class='header2__auth js-open-modal']"));
-        enterRegister.click();
-        WebElement enterEmail=driver.findElement(By.xpath("//input[@name='email' and @type='text' and @placeholder='Электронная почта'] "));
-        enterEmail.sendKeys("testpushkarskaya@yandex.ru");
-        WebElement enterPassword=driver.findElement(By.xpath("//input[@type='password']"));
-        enterPassword.sendKeys("testpushkarskaya2018");
-        WebElement enterLk=driver.findElement(By.xpath("//div[@class='new-log-reg__body']/descendant::button[@type='submit' and contains(text(),'Войти')]"));
-        enterLk.click();
-
-
-        //driver.manage().window().fullscreen();
-
-//        String address = "125167, г. Москва, Нарышкинская аллея., д. 5, стр. 2, тел. +7 499 938-92-02";
-//        logger.info("Загружена страница " + driver.getCurrentUrl());
-//
-//        WebElement contactElement = driver.findElement(By.cssSelector(".header2_subheader-link[href=\"/contacts/\"]"));
-//        contactElement.click();//Нажата ссылка Контакты
-//        WebElement actAddress= driver.findElement(By.xpath("/html/body/div[1]/div[2]/div[4]/div[1]/div[3]/div[2]"));
-//        logger.info(address);
-//        logger.info(actAddress.getText());
-//        Assert.assertEquals(address, actAddress.getText());
-        teardown();
+        browserOptions.add("--start-fullscreen");
+        browserOptions.add("--incognito");
+        browserOptions.add("--disable-notifications");
+        WebDriver wd = WebDriverFactory.createNewDriver(webDriverName.CHROME, browserOptions);
+        wd.get(url);
+        Assert.assertEquals("Онлайн‑курсы для профессионалов, дистанционное обучение современным профессиям",
+                wd.getTitle());
+        LoginPage page= PageFactory.initElements(wd,LoginPage.class);
+        page.auth();
+        page.login();
+        page.toLkPage();
+        lkPage pagelk= PageFactory.initElements(wd,lkPage.class);
+        pagelk.clickProfile();//Профиль
+        pagelk.clickLk();//Личный кабинет
+        pagelk.clickTabAbout();//О себе
+        DataArray();//Инициализация массива, в котором хранятся личные данные и контакты
+        pagelk.checkPersonalData(Data);
+        pagelk.checkContactData();
+        //
+        wd.quit();
     }
-
 }
