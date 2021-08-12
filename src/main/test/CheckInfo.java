@@ -1,6 +1,5 @@
 import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.LogManager;
-
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -28,20 +27,6 @@ public class CheckInfo{
     public WebDriver wd;
     List<String> browserOptions = new ArrayList();
     String url="https://otus.ru";
-
-
-//@Before
-//    public void setupTest() {
-//
-//
-//    }
-//
-//        @After
-//    public void teardown() {
-//        if (wd != null) {
-//            wd.quit();
-//        }
-//    }
 
     @Test
     public void setDataTest() {
