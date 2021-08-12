@@ -1,3 +1,5 @@
+package test;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.Assert;
@@ -133,10 +135,10 @@ public class lkPage {
         logger.info("Фактический результат поле фамилия (лат.)"+ driver.findElement(enSurname).getAttribute("value"));
         Assert.assertEquals(Data.get(3), driver.findElement(enSurname).getAttribute("value"));
         logger.info("Ожидание поле имя (в блоге) " +Data.get(4));
-        logger.info("Фактический результат (в блоге)"+ driver.findElement(blogName).getAttribute("value"));
+        logger.info("Фактический результат (в блоге) "+ driver.findElement(blogName).getAttribute("value"));
         Assert.assertEquals(Data.get(4), driver.findElement(blogName).getAttribute("value"));
         logger.info("Ожидание поле дата рождения " +Data.get(5));
-        logger.info("Фактический результат дата рождения"+ driver.findElement(dateOfBirth).getAttribute("value"));
+        logger.info("Фактический результат дата рождения "+ driver.findElement(dateOfBirth).getAttribute("value"));
         Assert.assertEquals(Data.get(5), driver.findElement(dateOfBirth).getAttribute("value"));
     }
 
